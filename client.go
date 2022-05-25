@@ -35,8 +35,14 @@ func NewClient(serverIp string, serverPort int) *Client {
 }
 
 func (this *Client) Run() {
+
 	for this.code != 0 {
-		for this.menu() != true {
+
+		var code int
+		_, err := fmt.Scanln(&code)
+		if err != nil {
+			for this.menu() != true {
+			}
 		}
 
 		switch this.code {
