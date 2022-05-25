@@ -44,7 +44,7 @@ func (this *Client) Run() {
 			this.Rename()
 			break
 		case PrivateChat:
-			fmt.Println("私聊模式")
+			this.PrivateChat()
 			break
 		case PublicChat:
 			fmt.Println("公聊模式")
@@ -93,7 +93,45 @@ func (this *Client) Rename() {
 
 }
 
-// 处理 server 回应的数据，直接显示到便准输出即可
+// PrivateChat 选择用户进行私聊
+func (this *Client) PrivateChat() {
+	var remoteName string
+	chatMsg := ""
+
+	this.SelectUsers()
+	fmt.Println(">>>请输入聊天对象[用户名]，回车退出")
+	fmt.Scanln(&remoteName)
+
+	for remoteName != "" && chatMsg != "exit" {
+
+		fmt.Println(">>>请输入聊天内容，exit退出.")
+
+		fmt.Scanln(&chatMsg)
+
+		if len(chatMsg) != 0 && chatMsg != "exit" {
+			sendMsg := "to|" + remoteName + "|" + chatMsg + "\n"
+			_, err := this.conn.Write([]byte(sendMsg))
+			if err != nil {
+				fmt.Println("conn Write err:", err)
+				break
+			}
+		}
+
+	}
+}
+
+// SelectUsers 查询在线用户
+func (this *Client) SelectUsers() {
+	sendMsg := "who\n"
+	_, err := this.conn.Write([]byte(sendMsg))
+
+	if err != nil {
+		fmt.Println("con Write err:", err)
+		return
+	}
+}
+
+// DealResponse 处理 server 回应的数据，直接显示到便准输出即可
 func (this *Client) DealResponse() {
 	// 一旦 client.conn 有数据，就直接 copy 到 stdout 标准输出上
 	// 永久阻塞监听
