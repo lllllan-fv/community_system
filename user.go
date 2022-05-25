@@ -63,8 +63,18 @@ func (this *User) ListenWrite(server *Server) {
 		}
 
 		// 获取用户输入（去掉'\n'）
-		msg := string(buf[:n-1])
-		server.BroadCast(this, msg)
+		msg := NewMsg(string(buf[:n-1]))
+		switch msg.code {
+		case Rename:
+			break
+		case PrivateChat:
+			break
+		case PublicChat:
+			break
+		case 0:
+			this.PrintMessage("[server]: 我不理解")
+			break
+		}
 	}
 }
 
