@@ -65,13 +65,15 @@ func (this *User) ListenWrite(server *Server) {
 
 		// 获取用户输入（去掉'\n'）
 		msg := NewMsg(string(buf[:n-1]))
+		split := strings.Split(msg.str, "|")
 		switch msg.code {
 		case Rename:
-			str := strings.Split(msg.str, "|")[1]
-			newName := strings.TrimSpace(str)
+			newName := strings.TrimSpace(split[1])
 			this.Rename(server, newName)
 			break
 		case PrivateChat:
+			to := strings.TrimSpace(split[1])
+			this.PrivateChatTo(server, to, split[2])
 			break
 		case PublicChat:
 			break
@@ -91,7 +93,7 @@ func (this *User) Rename(server *Server, newName string) {
 
 	_, ok := server.UserMap[newName]
 	if ok {
-		this.PrintMessage("[修改失败]: 当前用户名已存在 ")
+		this.PrintMessage("[修改失败]: 当前用户名已存在")
 		return
 	}
 
@@ -105,6 +107,21 @@ func (this *User) Rename(server *Server, newName string) {
 	this.Name = newName
 	fmt.Println("[", oldName, "] rename to", "[", newName, "]")
 	this.PrintMessage("[修改成功]: " + newName)
+}
+
+// PrivateChatTo 私聊
+func (this *User) PrivateChatTo(server *Server, to string, msg string) {
+	if to == "" {
+		this.PrintMessage("[发送失败]: 用户名不能为空")
+	}
+
+	user, ok := server.UserMap[to]
+	if ok {
+		this.PrintMessage("[发送成功]")
+		user.PrintMessage("[私聊消息][" + this.Name + "]: " + msg)
+	} else {
+		this.PrintMessage("[发送失败]: 用户不存在")
+	}
 }
 
 // Online 用户上线
