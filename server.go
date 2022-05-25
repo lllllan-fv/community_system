@@ -37,9 +37,7 @@ func (this *Server) Handler(conn net.Conn) {
 	conn.Write([]byte("建立连接...\n"))
 
 	// 上线加入 UserMap
-	this.mapLock.Lock()
-	this.UserMap[user.Addr] = user
-	this.mapLock.Unlock()
+	user.Online(this)
 
 	go this.ListenUserWrite(user)
 }
@@ -65,6 +63,7 @@ func (this *Server) ListenUserWrite(user *User) {
 
 		// 用户下线，不再发送消息
 		if n == 0 {
+			user.Offline(this)
 			return
 		}
 
