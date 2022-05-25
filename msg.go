@@ -1,5 +1,7 @@
 package main
 
+import "strings"
+
 type Msg struct {
 	str  string
 	code int
@@ -27,16 +29,18 @@ func NewMsg(str string) *Msg {
 	0 <else> 其他格式暂时不管
 */
 func calCode(str string) int {
-	if len(str) > 7 && str[:7] == "rename|" {
-		return Rename
+	n := len(strings.Split(str, "|"))
+
+	if len(str) > 4 && str[:4] == "pub|" && n == 2 {
+		return PublicChat
 	}
 
-	if len(str) > 5 && str[:3] == "to|" {
+	if len(str) > 5 && str[:3] == "to|" && n == 3 {
 		return PrivateChat
 	}
 
-	if len(str) > 4 && str[:4] == "pub|" {
-		return PublicChat
+	if len(str) > 7 && str[:7] == "rename|" && n == 2 {
+		return Rename
 	}
 
 	return 0
