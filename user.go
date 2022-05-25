@@ -1,6 +1,10 @@
 package main
 
-import "net"
+import (
+	"fmt"
+	"io"
+	"net"
+)
 
 type User struct {
 	Name string
@@ -38,6 +42,29 @@ func (this *User) ListenMessage() {
 func (this *User) PrintMessage(msg string) {
 	conn := this.conn
 	conn.Write([]byte(msg + "\n"))
+}
+
+func (this *User) ListenWrite(server *Server) {
+	buf := make([]byte, 4096)
+
+	for {
+		n, err := this.conn.Read(buf)
+
+		// 用户下线，不再发送消息
+		if n == 0 {
+			this.Offline(server)
+			return
+		}
+
+		if err != nil && err != io.EOF {
+			fmt.Println("Conn Read err:", err)
+			return
+		}
+
+		// 获取用户输入（去掉'\n'）
+		msg := string(buf[:n-1])
+		server.BroadCast(this, msg)
+	}
 }
 
 // Online 用户上线

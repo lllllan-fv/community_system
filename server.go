@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net"
 	"sync"
 )
@@ -41,7 +40,7 @@ func (this *Server) Handler(conn net.Conn) {
 	user.Online(this)
 
 	// server 监听该用户的输入
-	go this.ListenUserWrite(user)
+	go user.ListenWrite(this)
 }
 
 // BroadCast
@@ -57,31 +56,6 @@ func (this *Server) BroadCast(user *User, msg string) {
 		}
 	}
 	this.mapLock.Unlock()
-}
-
-// ListenUserWrite 监听用户的输入
-func (this *Server) ListenUserWrite(user *User) {
-	conn := user.conn
-	buf := make([]byte, 4096)
-
-	for {
-		n, err := conn.Read(buf)
-
-		// 用户下线，不再发送消息
-		if n == 0 {
-			user.Offline(this)
-			return
-		}
-
-		if err != nil && err != io.EOF {
-			fmt.Println("Conn Read err:", err)
-			return
-		}
-
-		// 获取用户输入（去掉'\n'）
-		msg := string(buf[:n-1])
-		this.BroadCast(user, msg)
-	}
 }
 
 func (this *Server) start() {
