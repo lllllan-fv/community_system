@@ -33,8 +33,41 @@ func NewClient(serverIp string, serverPort int) *Client {
 	return client
 }
 
-func (client *Client) Run() {
-	for client.code != 0 {
+func (this *Client) Run() {
+	for this.code != 0 {
+		for this.menu() != true {
+		}
+
+		switch this.code {
+		case Rename:
+			fmt.Println("更改用户名")
+			break
+		case PrivateChat:
+			fmt.Println("私聊模式")
+			break
+		case PublicChat:
+			fmt.Println("公聊模式")
+			break
+		}
+	}
+}
+
+func (this *Client) menu() bool {
+	var code int
+
+	fmt.Println("1.更改用户名")
+	fmt.Println("2.私聊模式")
+	fmt.Println("3.公聊模式")
+	fmt.Println("0.退出")
+
+	fmt.Scanln(&code)
+
+	if code >= 0 && code <= 3 {
+		this.code = code
+		return true
+	} else {
+		fmt.Println(">>>请输入合法范围内的数字...")
+		return false
 	}
 }
 

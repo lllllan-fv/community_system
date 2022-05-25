@@ -27,6 +27,7 @@ func NewMsg(str string) *Msg {
 	1 rename| 改名
 	2 to|toUser| 私聊
 	3 pub| 公聊
+	4 who| 查询在线用户
 	0 <else> 其他格式暂时不管
 */
 func calCode(str string) int {

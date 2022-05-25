@@ -29,9 +29,6 @@ func newServer(ip string, port int) *Server {
 func (this *Server) Handler(conn net.Conn) {
 	user := NewUser(conn)
 
-	// 当前连接的终端打印信息
-	conn.Write([]byte("建立连接...\n"))
-
 	// 上线加入 UserMap
 	user.Online(this)
 
