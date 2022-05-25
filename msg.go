@@ -11,6 +11,7 @@ const (
 	Rename = iota + 1
 	PrivateChat
 	PublicChat
+	OnlineUserList
 )
 
 func NewMsg(str string) *Msg {
@@ -30,6 +31,10 @@ func NewMsg(str string) *Msg {
 */
 func calCode(str string) int {
 	n := len(strings.Split(str, "|"))
+
+	if str == "who" {
+		return OnlineUserList
+	}
 
 	if len(str) > 4 && str[:4] == "pub|" && n == 2 {
 		return PublicChat

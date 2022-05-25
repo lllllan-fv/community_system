@@ -78,6 +78,9 @@ func (this *User) ListenWrite(server *Server) {
 		case PublicChat:
 			this.PublicChat(server, split[1])
 			break
+		case OnlineUserList:
+			this.PrintOnlineUserList(server)
+			break
 		case 0:
 			this.PrintMessage("[server]: 我不理解")
 			break
@@ -125,8 +128,20 @@ func (this *User) PrivateChatTo(server *Server, to string, msg string) {
 	}
 }
 
+// PublicChat 公聊
 func (this *User) PublicChat(server *Server, msg string) {
 	server.BroadCast(this, msg)
+}
+
+// PrintOnlineUserList 查询在线用户
+func (this *User) PrintOnlineUserList(server *Server) {
+	server.mapLock.Lock()
+	for _, user := range server.UserMap {
+		if user != this {
+			this.PrintMessage("[" + user.Name + "]: 在线")
+		}
+	}
+	server.mapLock.Unlock()
 }
 
 // Online 用户上线
