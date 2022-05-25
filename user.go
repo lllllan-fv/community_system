@@ -44,6 +44,7 @@ func (this *User) PrintMessage(msg string) {
 	conn.Write([]byte(msg + "\n"))
 }
 
+// ListenWrite 监听用户输入
 func (this *User) ListenWrite(server *Server) {
 	buf := make([]byte, 4096)
 
