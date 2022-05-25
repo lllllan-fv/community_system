@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"time"
 )
 
 type Client struct {
@@ -40,7 +41,7 @@ func (this *Client) Run() {
 
 		switch this.code {
 		case Rename:
-			fmt.Println("更改用户名")
+			this.Rename()
 			break
 		case PrivateChat:
 			fmt.Println("私聊模式")
@@ -52,6 +53,7 @@ func (this *Client) Run() {
 	}
 }
 
+// 请求菜单
 func (this *Client) menu() bool {
 	var code int
 
@@ -69,6 +71,26 @@ func (this *Client) menu() bool {
 		fmt.Println(">>>请输入合法范围内的数字...")
 		return false
 	}
+
+}
+
+// Rename 修改用户名
+func (this *Client) Rename() {
+	fmt.Println(">>>请输入用户名...")
+
+	var newName string
+	fmt.Scanln(&newName)
+
+	sendMsg := "rename|" + newName + "\n"
+	_, err := this.conn.Write([]byte(sendMsg))
+	if err != nil {
+		fmt.Println("conn.Write err:", err)
+		return
+	}
+
+	// 让子弹飞，等待 server 的响应结果
+	time.Sleep(time.Microsecond * 100)
+
 }
 
 // 处理 server 回应的数据，直接显示到便准输出即可
