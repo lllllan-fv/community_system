@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"sync"
 )
@@ -32,14 +33,50 @@ func newServer(ip string, port int) *Server {
 func (this *Server) Handler(conn net.Conn) {
 	user := NewUser(conn)
 
-	// 在开启 server 的终端中打印信息
-	fmt.Println("[" + user.Name + "]建立连接...")
-	defer fmt.Println("[" + user.Name + "]关闭连接...")
-
 	// 当前连接的终端打印信息
 	conn.Write([]byte("建立连接...\n"))
-	defer conn.Close()
-	defer conn.Write([]byte("关闭连接...\n"))
+
+	// 上线加入 UserMap
+	this.mapLock.Lock()
+	this.UserMap[user.Addr] = user
+	this.mapLock.Unlock()
+
+	go this.ListenUserWrite(user)
+}
+
+func (this *Server) BroadCast(user *User, msg string) {
+	sendMsg := "[" + user.Addr + "]" + user.Name + ":" + msg
+
+	this.mapLock.Lock()
+	for _, toUser := range this.UserMap {
+		if user != toUser {
+			toUser.Message <- sendMsg
+		}
+	}
+	this.mapLock.Unlock()
+}
+
+func (this *Server) ListenUserWrite(user *User) {
+	conn := user.conn
+	buf := make([]byte, 4096)
+
+	for {
+		n, err := conn.Read(buf)
+
+		// 用户下线，不再发送消息
+		if n == 0 {
+			return
+		}
+
+		if err != nil && err != io.EOF {
+			fmt.Println("Conn Read err:", err)
+			return
+		}
+
+		// 获取用户输入（去掉'\n'）
+		msg := string(buf[:n-1])
+		this.BroadCast(user, msg)
+	}
 }
 
 func (this *Server) start() {
@@ -54,6 +91,7 @@ func (this *Server) start() {
 		return
 	}
 
+	// 监听端口连接请求
 	for {
 		conn, err := listener.Accept()
 
@@ -62,6 +100,7 @@ func (this *Server) start() {
 			return
 		}
 
+		// 处理每一个连接请求
 		go this.Handler(conn)
 	}
 }

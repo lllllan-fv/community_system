@@ -8,7 +8,7 @@ type User struct {
 	conn net.Conn
 
 	// 消息接收
-	message chan string
+	Message chan string
 }
 
 func NewUser(conn net.Conn) *User {
@@ -18,8 +18,22 @@ func NewUser(conn net.Conn) *User {
 		Name:    addr,
 		Addr:    addr,
 		conn:    conn,
-		message: make(chan string),
+		Message: make(chan string),
 	}
 
+	go user.ListenMessage()
+
 	return user
+}
+
+func (this *User) ListenMessage() {
+	for {
+		msg := <-this.Message
+		this.PrintMessage(msg)
+	}
+}
+
+func (this *User) PrintMessage(msg string) {
+	conn := this.conn
+	conn.Write([]byte(msg + "\n"))
 }
