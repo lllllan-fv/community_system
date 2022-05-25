@@ -89,16 +89,16 @@ func (this *User) ListenWrite(server *Server) {
 }
 
 // Rename 修改用户名
-func (this *User) Rename(server *Server, newName string) bool {
+func (this *User) Rename(server *Server, newName string) {
 	if newName == "" {
 		this.PrintMessage("[修改失败]: 用户名不能为空")
-		return false
+		return
 	}
 
 	_, ok := server.UserMap[newName]
 	if ok {
 		this.PrintMessage("[修改失败]: 当前用户名已存在")
-		return false
+		return
 	}
 
 	oldName := this.Name
@@ -112,7 +112,7 @@ func (this *User) Rename(server *Server, newName string) bool {
 	fmt.Println("[", oldName, "] rename to", "[", newName, "]")
 	this.PrintMessage("[修改成功]: " + newName)
 
-	return true
+	return
 }
 
 // PrivateChatTo 私聊
