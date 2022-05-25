@@ -62,7 +62,10 @@ func (this *Client) menu() bool {
 	fmt.Println("3.公聊模式")
 	fmt.Println("0.退出")
 
-	fmt.Scanln(&code)
+	_, err := fmt.Scanln(&code)
+	if err != nil {
+		return false
+	}
 
 	if code >= 0 && code <= 3 {
 		this.code = code
