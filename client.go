@@ -11,7 +11,6 @@ import (
 type Client struct {
 	ServerIp   string
 	ServerPort int
-	Name       string
 	conn       net.Conn
 	code       int // 当前模式
 }
