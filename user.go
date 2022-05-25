@@ -82,6 +82,7 @@ func (this *User) ListenWrite(server *Server) {
 	}
 }
 
+// Rename 修改用户名
 func (this *User) Rename(server *Server, newName string) {
 	if newName == "" {
 		this.PrintMessage("[修改失败]: 用户名不能为空")
@@ -94,12 +95,15 @@ func (this *User) Rename(server *Server, newName string) {
 		return
 	}
 
+	oldName := this.Name
+
 	server.mapLock.Lock()
 	delete(server.UserMap, this.Name)
 	server.UserMap[newName] = this
 	server.mapLock.Unlock()
 
 	this.Name = newName
+	fmt.Println("[", oldName, "] rename to", "[", newName, "]")
 	this.PrintMessage("[修改成功]: " + newName)
 }
 
