@@ -47,7 +47,7 @@ func (this *Server) Handler(conn net.Conn) {
 // - server 对所有用户进行广播消息
 // - user 是发送消息的用户，可以为 nil
 func (this *Server) BroadCast(user *User, msg string) {
-	sendMsg := "[" + user.Addr + "]" + user.Name + ":" + msg
+	sendMsg := "[ " + user.Addr + " ]" + user.Name + ": " + msg
 
 	this.mapLock.Lock()
 	for _, toUser := range this.UserMap {

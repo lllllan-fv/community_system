@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"strings"
 )
 
 type User struct {
@@ -66,6 +67,9 @@ func (this *User) ListenWrite(server *Server) {
 		msg := NewMsg(string(buf[:n-1]))
 		switch msg.code {
 		case Rename:
+			str := strings.Split(msg.str, "|")[1]
+			newName := strings.TrimSpace(str)
+			this.Rename(server, newName)
 			break
 		case PrivateChat:
 			break
@@ -78,14 +82,36 @@ func (this *User) ListenWrite(server *Server) {
 	}
 }
 
+func (this *User) Rename(server *Server, newName string) {
+	if newName == "" {
+		this.PrintMessage("[修改失败]: 用户名不能为空")
+		return
+	}
+
+	_, ok := server.UserMap[newName]
+	if ok {
+		this.PrintMessage("[修改失败]: 当前用户名已存在 ")
+		return
+	}
+
+	server.mapLock.Lock()
+	delete(server.UserMap, this.Name)
+	server.UserMap[newName] = this
+	server.mapLock.Unlock()
+
+	this.Name = newName
+	this.PrintMessage("[修改成功]: " + newName)
+}
+
 // Online 用户上线
 // - 用户加入 server.UserMap
 // - 对所有用户进行广播提示
 func (this *User) Online(server *Server) {
 	server.mapLock.Lock()
-	server.UserMap[this.Addr] = this
+	server.UserMap[this.Name] = this
 	server.mapLock.Unlock()
 
+	fmt.Println("[", this.Name, "]", "已上线")
 	server.BroadCast(this, "已上线")
 }
 
@@ -94,8 +120,9 @@ func (this *User) Online(server *Server) {
 // - 对所有用户进行广播提示
 func (this *User) Offline(server *Server) {
 	server.mapLock.Lock()
-	delete(server.UserMap, this.Addr)
+	delete(server.UserMap, this.Name)
 	server.mapLock.Unlock()
 
+	fmt.Println("[", this.Name, "]", "已下线")
 	server.BroadCast(this, "已下线")
 }
