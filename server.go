@@ -30,6 +30,7 @@ func newServer(ip string, port int) *Server {
 	return server
 }
 
+// Handler 处理每一个连接请求
 func (this *Server) Handler(conn net.Conn) {
 	user := NewUser(conn)
 
@@ -39,9 +40,13 @@ func (this *Server) Handler(conn net.Conn) {
 	// 上线加入 UserMap
 	user.Online(this)
 
+	// server 监听该用户的输入
 	go this.ListenUserWrite(user)
 }
 
+// BroadCast
+// - server 对所有用户进行广播消息
+// - user 是发送消息的用户，可以为 nil
 func (this *Server) BroadCast(user *User, msg string) {
 	sendMsg := "[" + user.Addr + "]" + user.Name + ":" + msg
 
@@ -54,6 +59,7 @@ func (this *Server) BroadCast(user *User, msg string) {
 	this.mapLock.Unlock()
 }
 
+// ListenUserWrite 监听用户的输入
 func (this *Server) ListenUserWrite(user *User) {
 	conn := user.conn
 	buf := make([]byte, 4096)

@@ -26,6 +26,7 @@ func NewUser(conn net.Conn) *User {
 	return user
 }
 
+// ListenMessage 接收 server 发来的消息
 func (this *User) ListenMessage() {
 	for {
 		msg := <-this.Message
@@ -33,11 +34,15 @@ func (this *User) ListenMessage() {
 	}
 }
 
+// PrintMessage 终端打印消息
 func (this *User) PrintMessage(msg string) {
 	conn := this.conn
 	conn.Write([]byte(msg + "\n"))
 }
 
+// Online 用户上线
+// - 用户加入 server.UserMap
+// - 对所有用户进行广播提示
 func (this *User) Online(server *Server) {
 	server.mapLock.Lock()
 	server.UserMap[this.Addr] = this
@@ -46,6 +51,9 @@ func (this *User) Online(server *Server) {
 	server.BroadCast(this, "已上线")
 }
 
+// Offline 用户下线
+// - 用户移出 server.UserMap
+// - 对所有用户进行广播提示
 func (this *User) Offline(server *Server) {
 	server.mapLock.Lock()
 	delete(server.UserMap, this.Addr)
