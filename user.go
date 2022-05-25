@@ -132,6 +132,7 @@ func (this *User) PrivateChatTo(server *Server, to string, msg string) {
 
 // PublicChat 公聊
 func (this *User) PublicChat(server *Server, msg string) {
+	this.PrintMessage("[发送成功]")
 	server.BroadCast(this, msg)
 }
 

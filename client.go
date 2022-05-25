@@ -47,7 +47,7 @@ func (this *Client) Run() {
 			this.PrivateChat()
 			break
 		case PublicChat:
-			fmt.Println("公聊模式")
+			this.PublicChat()
 			break
 		}
 	}
@@ -131,6 +131,28 @@ func (this *Client) SelectUsers() {
 	if err != nil {
 		fmt.Println("con Write err:", err)
 		return
+	}
+}
+
+// PublicChat 公聊
+func (this *Client) PublicChat() {
+	chatMsg := ""
+
+	for chatMsg != "exit" {
+
+		fmt.Println(">>>请输入聊天内容，exit退出.")
+
+		fmt.Scanln(&chatMsg)
+
+		if len(chatMsg) != 0 && chatMsg != "exit" {
+			sendMsg := "pub|" + chatMsg + "\n"
+			_, err := this.conn.Write([]byte(sendMsg))
+			if err != nil {
+				fmt.Println("conn Write err:", err)
+				break
+			}
+		}
+
 	}
 }
 
