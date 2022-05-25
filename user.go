@@ -76,6 +76,7 @@ func (this *User) ListenWrite(server *Server) {
 			this.PrivateChatTo(server, to, split[2])
 			break
 		case PublicChat:
+			this.PublicChat(server, split[1])
 			break
 		case 0:
 			this.PrintMessage("[server]: 我不理解")
@@ -118,10 +119,14 @@ func (this *User) PrivateChatTo(server *Server, to string, msg string) {
 	user, ok := server.UserMap[to]
 	if ok {
 		this.PrintMessage("[发送成功]")
-		user.PrintMessage("[私聊消息][" + this.Name + "]: " + msg)
+		user.Message <- "[私聊消息][" + this.Name + "]: " + msg
 	} else {
 		this.PrintMessage("[发送失败]: 用户不存在")
 	}
+}
+
+func (this *User) PublicChat(server *Server, msg string) {
+	server.BroadCast(this, msg)
 }
 
 // Online 用户上线
