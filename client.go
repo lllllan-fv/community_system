@@ -55,6 +55,9 @@ func (this *Client) Run() {
 			this.PublicChat()
 			break
 		}
+
+		// 让子弹飞，等待 server 的响应结果
+		time.Sleep(time.Microsecond * 100)
 	}
 }
 
@@ -96,9 +99,6 @@ func (this *Client) Rename() {
 		return
 	}
 
-	// 让子弹飞，等待 server 的响应结果
-	time.Sleep(time.Microsecond * 100)
-
 }
 
 // PrivateChat 选择用户进行私聊
@@ -124,6 +124,9 @@ func (this *Client) PrivateChat() {
 				break
 			}
 		}
+
+		// 让子弹飞，等待 server 的响应结果
+		time.Sleep(time.Microsecond * 100)
 
 	}
 }
@@ -157,6 +160,9 @@ func (this *Client) PublicChat() {
 				break
 			}
 		}
+
+		// 让子弹飞，等待 server 的响应结果
+		time.Sleep(time.Microsecond * 100)
 
 	}
 }
